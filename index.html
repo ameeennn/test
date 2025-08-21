@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Study Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-500 via-purple-500 to-green-400 min-h-screen flex items-center justify-center font-sans">
+  
+  <div class="text-center w-full max-w-2xl p-6">
+    <!-- Logo and Header -->
+    <div class="flex justify-between items-center mb-12">
+      <h1 class="text-2xl font-bold text-white">📚 StudyMate AI</h1>
+      <button id="loginBtn" class="bg-white text-purple-600 px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-purple-100 transition">Login / Sign Up</button>
+      <button id="logoutBtn" class="hidden bg-red-500 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-red-600 transition">Logout</button>
+    </div>
+
+    <!-- Welcome Message -->
+    <h2 id="welcomeMsg" class="text-3xl md:text-4xl font-extrabold text-white mb-8 drop-shadow-lg">
+      Hey Learner 👋 Ready to Level Up Your Studies?
+    </h2>
+
+    <!-- Buttons -->
+    <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
+      <button class="bg-white text-purple-600 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-105 hover:bg-purple-100 transition">
+        🎯 Entrance Exam
+      </button>
+      <button class="bg-white text-blue-600 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-105 hover:bg-blue-100 transition">
+        📖 CBSE
+      </button>
+      <button class="bg-white text-green-600 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-105 hover:bg-green-100 transition">
+        🏫 Kerala Syllabus
+      </button>
+    </div>
+
+    <!-- Footer Quote -->
+    <p class="mt-12 text-white text-lg italic drop-shadow-md">
+      "Small steps every day lead to big results."
+    </p>
+  </div>
+
+  <script>
+    // Firebase config (replace with your own project keys from Firebase Console)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVxv1wfMXMtaXx05ru3oogVigJ48TTbGg",
+      authDomain: "studymate-ai-890.firebaseapp.com",
+      projectId: "studymate-ai-890",
+      storageBucket: "studymate-ai-890.appspot.com",
+      messagingSenderId: "720471355142",
+      appId: "1:720471355142:web:791ec36ab8ad711713f887"
+    };
+
+    // Init Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Buttons and text
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const welcomeMsg = document.getElementById("welcomeMsg");
+
+    // Track auth state (auto-login)
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // User logged in
+        loginBtn.classList.add("hidden");
+        logoutBtn.classList.remove("hidden");
+        welcomeMsg.textContent = `Welcome back, ${user.displayName} 👋`; 
+      } else {
+        // No user
+        loginBtn.classList.remove("hidden");
+        logoutBtn.classList.add("hidden");
+        welcomeMsg.textContent = "Hey Learner 👋 Ready to Level Up Your Studies?";
+      }
+    });
+
+    // Google OAuth Login
+    loginBtn.addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          // Save user in Firestore
+          db.collection("users").doc(user.uid).set({
+            name: user.displayName,
+            email: user.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+        })
+        .catch(err => alert(err.message));
+    });
+
+    // Logout
+    logoutBtn.addEventListener("click", () => {
+      auth.signOut();
+    });
+  </script>
+
+</body>
+</html>
