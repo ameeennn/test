@@ -10,37 +10,40 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gradient-to-br from-blue-500 via-purple-500 to-green-400 min-h-screen flex items-center justify-center font-sans">
-  
-  <div class="text-center w-full max-w-2xl p-6">
-    <!-- Logo and Header -->
-    <div class="flex justify-between items-center mb-12 relative">
+  <div class="text-center w-full max-w-4xl p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8 relative">
+      <!-- Logo -->
       <h1 class="text-2xl font-bold text-white">📚 StudyMate AI</h1>
- 
-      <!-- Right section (Profile + Auth Buttons) -->
-      <div class="flex items-center space-x-3 relative">
-        <!-- Profile Pic + Name -->
-        <img id="userPic" class="hidden w-10 h-10 rounded-full border-2 border-white cursor-pointer" alt="User Pic">
-        <span id="userName" class="hidden font-medium text-white"></span>
-
-        <!-- Login/Logout -->
-        <button id="loginBtn" class="bg-white text-purple-600 px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-purple-100 transition">Login / Sign Up</button>
-        
-        <!-- Dropdown -->
-        <div id="profileDropdown" class="hidden absolute right-0 top-14 bg-white text-black rounded-lg shadow-lg w-48">
-          <ul class="flex flex-col">
-            <li id="profileBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer">👤 Profile</li>
-            <li id="settingsBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer">⚙️ Settings</li>
-            <li id="logoutDropdownBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer">🚪 Logout</li>
-          </ul>
+      <!-- Right section -->
+      <div class="flex items-center space-x-4 relative">
+        <!-- Login Button -->
+        <button id="loginBtn"
+          class="bg-white text-purple-600 px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-purple-100 transition">
+          Login / Sign Up
+        </button>
+        <!-- Profile Section -->
+        <div id="profileWrapper" class="relative">
+          <!-- Profile Pic -->
+          <img id="userPic"
+            class="hidden w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:scale-105 transition-transform"
+            alt="User Pic">
+          <!-- Dropdown -->
+          <div id="profileDropdown"
+            class="hidden absolute right-0 mt-3 bg-white text-black rounded-xl shadow-xl w-52 overflow-hidden">
+            <ul class="flex flex-col text-left">
+              <li id="profileBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer">👤 Profile</li>
+              <li id="settingsBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer">⚙️ Settings</li>
+              <li id="logoutDropdownBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer text-red-600">🚪 Logout</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-  </div>
     <!-- Welcome Message -->
     <h2 id="welcomeMsg" class="text-3xl md:text-4xl font-extrabold text-white mb-8 drop-shadow-lg">
       Hey Learner 👋 Ready to Level Up Your Studies?
     </h2>
-
     <!-- Buttons -->
     <div class="flex flex-col md:flex-row gap-6 justify-center items-center">
       <button class="bg-white text-purple-600 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-105 hover:bg-purple-100 transition">
@@ -53,87 +56,75 @@
         🏫 Kerala Syllabus
       </button>
     </div>
-
     <!-- Footer Quote -->
     <p class="mt-12 text-white text-lg italic drop-shadow-md">
       "Small steps every day lead to big results."
     </p>
   </div>
-
+  <!-- Firebase + Auth Script -->
   <script>
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyCVxv1wfMXMtaXx05ru3oogVigJ48TTbGg",
-    authDomain: "studymate-ai-890.firebaseapp.com",
-    projectId: "studymate-ai-890",
-    storageBucket: "studymate-ai-890.firebasestorage.app",
-    messagingSenderId: "720471355142",
-    appId: "1:720471355142:web:791ec36ab8ad711713f887"
-  };
-
-  // Init Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  // Elements
-  const loginBtn = document.getElementById("loginBtn");
-  const userPic = document.getElementById("userPic");
-  const userName = document.getElementById("userName");
-  const profileDropdown = document.getElementById("profileDropdown");
-  const logoutDropdownBtn = document.getElementById("logoutDropdownBtn");
-
-  // Track auth state
-  auth.onAuthStateChanged((user) => {
-    if (user) {
-      // Show profile info
-      loginBtn.classList.add("hidden");
-      userPic.classList.remove("hidden");
-      userName.classList.remove("hidden");
-
-      userPic.src = user.photoURL || "https://via.placeholder.com/150";
-      userName.textContent = user.displayName || "User";
-
-      // Save user in Firestore
-      db.collection("users").doc(user.uid).set({
-        name: user.displayName,
-        email: user.email,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
-    } else {
-      // User not logged in
-      loginBtn.classList.remove("hidden");
-      userPic.classList.add("hidden");
-      userName.classList.add("hidden");
-      profileDropdown.classList.add("hidden");
-    }
-  });
-
-  // Google OAuth Login
-  loginBtn.addEventListener("click", () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider).catch(err => alert(err.message));
-  });
-
-  // Dropdown toggle when clicking profile pic
-  userPic.addEventListener("click", () => {
-    profileDropdown.classList.toggle("hidden");
-  });
-
-  // Logout from dropdown
-  logoutDropdownBtn.addEventListener("click", () => {
-    auth.signOut();
-    profileDropdown.classList.add("hidden");
-  });
-
-  // Optional: Close dropdown if clicking outside
-  window.addEventListener("click", (e) => {
-    if (!userPic.contains(e.target) && !profileDropdown.contains(e.target)) {
-      profileDropdown.classList.add("hidden");
-    }
-  });
-</script>
-
-
+    // ✅ Replace with your exact Firebase config from console
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVxv1wfMXMtaXx05ru3oogVigJ48TTbGg",
+      authDomain: "studymate-ai-890.firebaseapp.com",
+      projectId: "studymate-ai-890",
+      storageBucket: "studymate-ai-890.firebasestorage.app",
+      messagingSenderId: "720471355142",
+      appId: "1:720471355142:web:791ec36ab8ad711713f887"
+    };
+    // Init Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    // Elements
+    const loginBtn = document.getElementById("loginBtn");
+    const userPic = document.getElementById("userPic");
+    const profileWrapper = document.getElementById("profileWrapper");
+    const profileDropdown = document.getElementById("profileDropdown");
+    const logoutDropdownBtn = document.getElementById("logoutDropdownBtn");
+    const welcomeMsg = document.getElementById("welcomeMsg");
+    // Track auth state
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        loginBtn.classList.add("hidden");
+        userPic.classList.remove("hidden");
+        userPic.src = user.photoURL || "https://via.placeholder.com/150";
+        welcomeMsg.textContent = `Welcome back, ${user.displayName || "User"} 👋`;
+        db.collection("users").doc(user.uid).set({
+          name: user.displayName,
+          email: user.email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      } else {
+        loginBtn.classList.remove("hidden");
+        userPic.classList.add("hidden");
+        profileDropdown.classList.add("hidden");
+        welcomeMsg.textContent = "Hey Learner 👋 Ready to Level Up Your Studies?";
+      }
+    });
+    // Google OAuth Login
+    loginBtn.addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(err => alert(err.message));
+    });
+    // Toggle dropdown on profile pic click
+    userPic.addEventListener("click", () => {
+      profileDropdown.classList.toggle("hidden");
+    });
+    // Logout
+    logoutDropdownBtn.addEventListener("click", () => {
+      auth.signOut().then(() => {
+        profileWrapper.classList.add("hidden");
+        loginBtn.classList.remove("hidden");
+        profileDropdown.classList.add("hidden");
+      }).catch(err => alert(err.message));
+    });
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!profileWrapper.contains(e.target) && !userPic.contains(e.target)) {
+        profileDropdown.classList.add("hidden");
+      }
+    });
+  </script>
 </body>
 </html>
