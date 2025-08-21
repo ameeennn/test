@@ -13,16 +13,30 @@
   
   <div class="text-center w-full max-w-2xl p-6">
     <!-- Logo and Header -->
-    <div class="flex justify-between items-center mb-12">
+    <div class="flex justify-between items-center mb-12 relative">
       <h1 class="text-2xl font-bold text-white">📚 StudyMate AI</h1>
-      <img id="userPic" class="hidden w-10 h-10 rounded-full border-2 border-white" alt="User Pic">
-      <span id="userName" class="hidden font-medium"></span>
+ 
+      <!-- Right section (Profile + Auth Buttons) -->
+      <div class="flex items-center space-x-3 relative">
+        <!-- Profile Pic + Name -->
+        <img id="userPic" class="hidden w-10 h-10 rounded-full border-2 border-white cursor-pointer" alt="User Pic">
+        <span id="userName" class="hidden font-medium text-white"></span>
 
-      
-      <button id="loginBtn" class="bg-white text-purple-600 px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-purple-100 transition">Login / Sign Up</button>
-      <button id="logoutBtn" class="hidden bg-red-500 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-red-600 transition">Logout</button>
+        <!-- Login/Logout -->
+        <button id="loginBtn" class="bg-white text-purple-600 px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-purple-100 transition">Login / Sign Up</button>
+        <button id="logoutBtn" class="hidden bg-red-500 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-red-600 transition">Logout</button>
+
+        <!-- Dropdown -->
+        <div id="profileDropdown" class="hidden absolute right-0 top-14 bg-white text-black rounded-lg shadow-lg w-48">
+          <ul class="flex flex-col">
+            <li id="profileBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer">👤 Profile</li>
+            <li id="settingsBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer">⚙️ Settings</li>
+            <li id="logoutDropdownBtn" class="px-4 py-2 hover:bg-gray-100 cursor-pointer">🚪 Logout</li>
+          </ul>
+        </div>
+      </div>
     </div>
-
+  </div>
     <!-- Welcome Message -->
     <h2 id="welcomeMsg" class="text-3xl md:text-4xl font-extrabold text-white mb-8 drop-shadow-lg">
       Hey Learner 👋 Ready to Level Up Your Studies?
