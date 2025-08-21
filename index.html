@@ -24,8 +24,7 @@
 
         <!-- Login/Logout -->
         <button id="loginBtn" class="bg-white text-purple-600 px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-purple-100 transition">Login / Sign Up</button>
-        <button id="logoutBtn" class="hidden bg-red-500 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-red-600 transition">Logout</button>
-
+        
         <!-- Dropdown -->
         <div id="profileDropdown" class="hidden absolute right-0 top-14 bg-white text-black rounded-lg shadow-lg w-48">
           <ul class="flex flex-col">
@@ -62,62 +61,80 @@
   </div>
 
   <script>
-    // Firebase config (replace with your own project keys from Firebase Console)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCVxv1wfMXMtaXx05ru3oogVigJ48TTbGg",
-      authDomain: "studymate-ai-890.firebaseapp.com",
-      projectId: "studymate-ai-890",
-      storageBucket: "studymate-ai-890.firebasestorage.app",
-      messagingSenderId: "720471355142",
-      appId: "1:720471355142:web:791ec36ab8ad711713f887"
-    };
+    <script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVxv1wfMXMtaXx05ru3oogVigJ48TTbGg",
+    authDomain: "studymate-ai-890.firebaseapp.com",
+    projectId: "studymate-ai-890",
+    storageBucket: "studymate-ai-890.firebasestorage.app",
+    messagingSenderId: "720471355142",
+    appId: "1:720471355142:web:791ec36ab8ad711713f887"
+  };
 
-    // Init Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  // Init Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-    // Buttons and text
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const welcomeMsg = document.getElementById("welcomeMsg");
+  // Elements
+  const loginBtn = document.getElementById("loginBtn");
+  const userPic = document.getElementById("userPic");
+  const userName = document.getElementById("userName");
+  const profileDropdown = document.getElementById("profileDropdown");
+  const logoutDropdownBtn = document.getElementById("logoutDropdownBtn");
 
-    // Track auth state (auto-login)
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User logged in
-        loginBtn.classList.add("hidden");
-        logoutBtn.classList.remove("hidden");
-        welcomeMsg.textContent = `Welcome back, ${user.displayName} 👋`; 
-      } else {
-        // No user
-        loginBtn.classList.remove("hidden");
-        logoutBtn.classList.add("hidden");
-        welcomeMsg.textContent = "Hey Learner 👋 Ready to Level Up Your Studies?";
-      }
-    });
+  // Track auth state
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      // Show profile info
+      loginBtn.classList.add("hidden");
+      userPic.classList.remove("hidden");
+      userName.classList.remove("hidden");
 
-    // Google OAuth Login
-    loginBtn.addEventListener("click", () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          const user = result.user;
-          // Save user in Firestore
-          db.collection("users").doc(user.uid).set({
-            name: user.displayName,
-            email: user.email,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
-        })
-        .catch(err => alert(err.message));
-    });
+      userPic.src = user.photoURL || "https://via.placeholder.com/150";
+      userName.textContent = user.displayName || "User";
 
-    // Logout
-    logoutBtn.addEventListener("click", () => {
-      auth.signOut();
-    });
-  </script>
+      // Save user in Firestore
+      db.collection("users").doc(user.uid).set({
+        name: user.displayName,
+        email: user.email,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    } else {
+      // User not logged in
+      loginBtn.classList.remove("hidden");
+      userPic.classList.add("hidden");
+      userName.classList.add("hidden");
+      profileDropdown.classList.add("hidden");
+    }
+  });
+
+  // Google OAuth Login
+  loginBtn.addEventListener("click", () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch(err => alert(err.message));
+  });
+
+  // Dropdown toggle when clicking profile pic
+  userPic.addEventListener("click", () => {
+    profileDropdown.classList.toggle("hidden");
+  });
+
+  // Logout from dropdown
+  logoutDropdownBtn.addEventListener("click", () => {
+    auth.signOut();
+    profileDropdown.classList.add("hidden");
+  });
+
+  // Optional: Close dropdown if clicking outside
+  window.addEventListener("click", (e) => {
+    if (!userPic.contains(e.target) && !profileDropdown.contains(e.target)) {
+      profileDropdown.classList.add("hidden");
+    }
+  });
+</script>
+
 
 </body>
 </html>
